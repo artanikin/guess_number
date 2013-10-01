@@ -1,40 +1,61 @@
 require "spec_helper"
 
 describe GuessNumber do
+    
+    let(:guess) { GuessNumber.new }
+    
 
     describe "#new" do
-        before :all do
-            @gn = GuessNumber.new
+        it { should be_instance_of GuessNumber }
+
+        it "counter equal 0" do
+           guess.counter.should eql 0
         end
 
-        it "return a new GuessNumber object" do
-            @gn.should be_instance_of GuessNumber
+        it "generated number in range" do
+            (1..10).should be_include guess.generated_value
         end
+    end
 
-        it "has a generated number" do
-            @gn.should respond_to :generated_number
-        end
-        
-        it "has a counter" do
-            @gn.should respond_to :counter
-        end
 
-        context "generated number" do
-            
-            subject { @gn.generated_number }
+    describe "#start" do
 
-            it "should be integer" do
-                subject.should be_an_integer    
-            end
+       before do
+          guess.generated_value = 5
+          guess.stub(:gets).and_return "1", "3", "6", "string", "5"
 
-            it "should be greater than or equal to 1" do
-                expect(subject).to be >= 1
-            end
-            
-            it "should be less than or equal to 100" do
-                expect(subject).to be <= 100
-            end
-        end
+          input_in_file("./tmp/out") { guess.start }
+          @output = read_from_file("./tmp/out")
+       end
+
+
+       it "print \"Input number >>\"" do
+            @output[0].should match /Input number >>/i
+       end     
+
+       it "print \"less\"" do
+            @output[2].should match /less/i 
+       end
+
+       it "print \"greater\"" do
+            @output[1].should match /greater/i
+       end
+
+       it "print \"Congratulations\"" do
+            @output.last.should match /Congratulations/i
+       end
+
+       it "print \"This is not numeric\"" do
+            @output[3].should =~ /This is not numeric/i
+       end
+       it { guess.counter.should be_eql 5 }
+
+    end
+
+
+    describe "numeric?" do
+        it { guess.should be_numeric "5" }
+        it { guess.should_not be_numeric "string" }
     end
 
 end

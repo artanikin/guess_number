@@ -1,5 +1,26 @@
 require_relative "../guess_number"
 
+def input_in_file filename
+    file = File.new(filename, "w")
+    $stdout = file
+    
+    yield
+
+    file.close
+    $stdout = STDOUT
+end
+
+def read_from_file filename
+    
+    arr = []
+    f = File.new(filename, "r")
+    f.each do |line|
+        arr << line if line =~ /[a-zA-Z]/
+    end 
+    f.close    
+    arr
+end
+
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
